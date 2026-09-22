@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 
+@import "tailwindcss";
+
 @theme {
   --color-navy: #062F4F;
   --color-navy-dark: #041F35;
@@ -10,33 +12,28 @@
   --color-gold-dark: #C58D12;
   --color-gold-light: #E5B33A;
 
-  --font-serif: "Playfair Display", serif;
+  --font-serif: var(--font-playfair), serif;
+  --font-sans: var(--font-inter), sans-serif;
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 8rem; /* keeps section headings clear of the sticky header */
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    font-family: var(--font-sans);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+
 
 /* keep any other rules create-next-app already put below this,
    e.g. :root { ... }, body { ... }, dark mode media queries, etc. */
