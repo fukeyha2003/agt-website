@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+
+@theme {
+  --color-navy: #062F4F;
+  --color-navy-dark: #041F35;
+  --color-navy-light: #0B4470;
+
+  --color-gold: #D89B16;
+  --color-gold-dark: #C58D12;
+  --color-gold-light: #E5B33A;
+
+  --font-serif: "Playfair Display", serif;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -24,3 +37,6 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* keep any other rules create-next-app already put below this,
+   e.g. :root { ... }, body { ... }, dark mode media queries, etc. */
