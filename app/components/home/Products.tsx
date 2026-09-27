@@ -8,7 +8,7 @@ const PRODUCTS = [
   { slug: 'ms-petrol', title: 'MS / Petrol', subtitle: 'Motor Spirit' },
   { slug: 'hsd-diesel', title: 'HSD / Diesel', subtitle: 'High Speed Diesel' },
   { slug: 'lubricants', title: 'Lubricants', subtitle: 'Engine & Industrial' },
-  { slug: 'other-petroleum', title: 'Other Products', subtitle: 'Based on Market Demand' },
+  { slug: 'other-products', title: 'Other Products', subtitle: 'Based on Market Demand' },
 ]
 
 export default function Products() {

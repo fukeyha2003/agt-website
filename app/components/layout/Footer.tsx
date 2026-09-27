@@ -35,13 +35,13 @@ export default function Footer() {
           {/* BRAND */}
           <Link
             href="/#home"
-            aria-label="Abdul Ghafoor Oil & Gas Traders — home"
+            aria-label="AG Oil & Gas Traders — home"
             className="flex items-center gap-3.5 rounded-md sm:col-span-2 lg:col-span-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-light focus-visible:ring-offset-2 focus-visible:ring-offset-navy"
           >
             <Image src="/images/agt-logo.png" alt="" width={64} height={64} className="h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16" />
             <span className="block">
               <span className="block font-serif text-[15px] font-bold uppercase leading-tight tracking-[0.02em] sm:text-base">
-                Abdul Ghafoor <span className="text-gold-light">Oil &amp; Gas</span> Traders
+                AG <span className="text-gold-light">Oil &amp; Gas</span> Traders
               </span>
               <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.16em] text-white/65 sm:text-[10px]">
                 Petroleum · Lubricants · Energy · Logistics Solutions
@@ -56,7 +56,7 @@ export default function Footer() {
               <circle cx="12" cy="9.5" r="2.5" />
             </svg>
             <address className="text-[13px] not-italic leading-5 text-white/85">
-              Office# A-9-B, Sector R-4,
+              Office# R-57, Sector Z-6,
               <br />
               Gulshan-e-Maymar, Karachi
             </address>
@@ -109,7 +109,7 @@ export default function Footer() {
 
         {/* BOTTOM BAR */}
         <div className="flex flex-col gap-4 border-t border-white/15 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-white/70">&copy; {new Date().getFullYear()} Abdul Ghafoor Oil &amp; Gas Traders. All Rights Reserved.</p>
+          <p className="text-xs text-white/70">&copy; {new Date().getFullYear()} AG Oil &amp; Gas Traders. All Rights Reserved.</p>
 
           <nav aria-label="Footer">
             <ul className="flex flex-wrap items-center gap-y-2 text-xs text-white/80 sm:divide-x sm:divide-white/25">

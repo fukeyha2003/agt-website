@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
-import Header from '@/app/components/layout/Header'
-import Footer from '@/app/components/layout/Footer'
+import SiteChrome from '@/app/components/layout/SiteChrome'
 import './globals.css'
 
 // Body font — swap Inter for whatever you used before, if different
@@ -20,9 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} min-h-screen bg-white text-navy antialiased`}>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   )

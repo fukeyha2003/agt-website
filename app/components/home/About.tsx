@@ -74,7 +74,7 @@ export default function About() {
 
             <div className="mt-5 space-y-4 text-[15px] leading-7 text-navy/75 sm:text-base sm:leading-8">
               <p>
-                Abdul Ghafoor Oil &amp; Gas Traders is a Karachi based trading and consultancy firm, committed to
+                AG Oil &amp; Gas Traders is a Karachi based trading and consultancy firm, committed to
                 delivering reliable, efficient and cost-effective solutions in the petroleum, energy and business
                 sectors.
               </p>

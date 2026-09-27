@@ -1,9 +1,9 @@
 import QuoteForm from '@/app/components/forms/QuoteForm'
 
 export const metadata = {
-  title: 'Request a Quote | Abdul Ghafoor Oil & Gas Traders',
+  title: 'Request a Quote | AG Oil & Gas Traders',
   description:
-    'Request a quote from Abdul Ghafoor Oil & Gas Traders for LPG, petrol, diesel, lubricants, logistics and business consultancy.',
+    'Request a quote from AG Oil & Gas Traders for LPG, petrol, diesel, lubricants, logistics and business consultancy.',
 }
 
 const STEPS: [string, string][] = [
@@ -16,6 +16,12 @@ export default function RequestQuotePage() {
   return (
     <main>
       <section className="relative isolate overflow-hidden bg-[#062F4F] pb-28 pt-14 sm:pb-32 sm:pt-16 lg:pb-36 lg:pt-20">
+        {/* grid texture */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07] [background-image:linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_at_30%_50%,black_20%,transparent_75%)]"
+        />
+
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
           <div className="flex items-center gap-3">
             <span className="h-px w-8 shrink-0 bg-[#D89B16] sm:w-14" />
@@ -40,6 +46,12 @@ export default function RequestQuotePage() {
           <QuoteForm />
 
           <aside className="relative isolate overflow-hidden rounded-2xl bg-[#062F4F] p-6 text-white shadow-[0_20px_50px_rgba(6,47,79,0.22)] sm:p-8 lg:sticky lg:top-6">
+            {/* grid texture — re-centered for this narrower box */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07] [background-image:linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_at_50%_50%,black_20%,transparent_75%)]"
+            />
+
             <h2 className="font-serif text-xl font-bold sm:text-2xl">What happens next</h2>
 
             <ol className="mt-6 space-y-5">
@@ -75,7 +87,7 @@ export default function RequestQuotePage() {
                     <circle cx="12" cy="9.5" r="2.5" />
                   </svg>
                   <address className="not-italic leading-5">
-                    Office# A-9-B, Sector R-4,
+                    Office# R-57, Sector Z-6,
                     <br />
                     Gulshan-e-Maymar, Karachi
                   </address>

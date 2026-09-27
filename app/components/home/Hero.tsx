@@ -73,7 +73,7 @@ export default function Hero() {
           <div className="mb-5 flex items-center gap-3 sm:mb-6">
             <span className="h-px w-8 shrink-0 bg-gold sm:w-14" />
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold-light sm:text-sm sm:tracking-[0.28em]">
-              Abdul Ghafoor Oil &amp; Gas Traders
+              AG Oil &amp; Gas Traders
             </p>
           </div>
 
@@ -180,7 +180,7 @@ export default function Hero() {
       </div>
 
       <div aria-hidden className="pointer-events-none absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-white/50 lg:flex">
-        <span className="text-[9px] font-semibold uppercase tracking-[0.25em]">Discover AGT</span>
+        <span className="text-[9px] font-semibold uppercase tracking-[0.25em]">Discover AG</span>
         <span className="flex h-8 w-5 items-start justify-center rounded-full border border-white/25 p-1">
           <span className="h-1.5 w-1 animate-bounce rounded-full bg-gold" />
         </span>

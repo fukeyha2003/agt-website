@@ -104,7 +104,7 @@ export default function Header() {
               <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1116 0z" />
               <circle cx="12" cy="10" r="2.5" />
             </svg>
-            <span>Office# A-9-B, Sector R-4, Gulshan-e-Maymar, Karachi</span>
+            <span>Office# R-57, Sector Z-6, Gulshan-e-Maymar, Karachi</span>
           </div>
         </div>
       </div>
@@ -117,18 +117,18 @@ export default function Header() {
             href="/#home"
             onClick={() => setMobileOpen(false)}
             className="group flex min-w-0 shrink items-center gap-2.5"
-            aria-label="Abdul Ghafoor Oil & Gas Traders Home"
+            aria-label="AG Oil & Gas Traders Home"
           >
             <Image
               src="/images/agt-logo.png"
-              alt="AGT"
+              alt="AG"
               width={52}
               height={52}
               className="h-[44px] w-[44px] object-contain transition-transform duration-300 group-hover:scale-[1.04] sm:h-[48px] sm:w-[48px] lg:h-[52px] lg:w-[52px]"
             />
             <div className="min-w-0 leading-none">
               <div className="truncate font-serif text-[14px] font-bold tracking-[-0.02em] text-navy sm:text-[16px] md:whitespace-nowrap md:text-[18px] lg:text-[20px]">
-                ABDUL GHAFOOR <span className="text-gold-dark">OIL &amp; GAS TRADERS</span>
+                AG <span className="text-gold-dark">OIL &amp; GAS TRADERS</span>
               </div>
               <div className="mt-1 hidden whitespace-nowrap text-[6px] font-semibold tracking-[0.19em] text-slate-500 sm:block sm:text-[7px] lg:text-[8px]">
                 PETROLEUM • LUBRICANTS • ENERGY • LOGISTICS SOLUTIONS
