@@ -1,6 +1,7 @@
 'use server'
 
-import { createAdminClient } from '@/app/lib/supabase/admin'
+import type { createAdminClient } from '@/app/lib/supabase/admin'
+import { requireAdmin } from '@/app/lib/supabase/require-admin'
 import { revalidatePath } from 'next/cache'
 
 type SupabaseAdmin = ReturnType<typeof createAdminClient>
@@ -53,7 +54,7 @@ function friendlyError(error: { code?: string; message: string }) {
 }
 
 export async function createPost(formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const fields = fieldsFromForm(formData)
 
   const cover = await uploadCover(supabase, formData.get('cover_image') as File | null, null)
@@ -74,7 +75,7 @@ export async function createPost(formData: FormData) {
 }
 
 export async function updatePost(id: number, formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const fields = fieldsFromForm(formData)
 
   const { data: existing } = await supabase.from('posts').select('cover_image, published_at').eq('id', id).single()
@@ -105,7 +106,7 @@ export async function updatePost(id: number, formData: FormData) {
 }
 
 export async function deletePost(id: number) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
 
   const { data: existing } = await supabase.from('posts').select('cover_image').eq('id', id).single()
   if (existing?.cover_image) {
@@ -120,7 +121,7 @@ export async function deletePost(id: number) {
 }
 
 export async function togglePostPublished(id: number, current: boolean) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
 
   const patch: Record<string, unknown> = { is_published: !current }
   if (!current) {

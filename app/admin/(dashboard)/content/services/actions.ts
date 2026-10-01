@@ -1,6 +1,6 @@
 'use server'
 
-import { createAdminClient } from '@/app/lib/supabase/admin'
+import { requireAdmin } from '@/app/lib/supabase/require-admin'
 import { revalidatePath } from 'next/cache'
 
 function slugify(text: string) {
@@ -34,7 +34,7 @@ function friendlyError(error: { code?: string; message: string }) {
 }
 
 export async function createService(formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const fields = fieldsFromForm(formData)
 
   const { data, error } = await supabase.from('services').insert(fields).select('id').single()
@@ -45,7 +45,7 @@ export async function createService(formData: FormData) {
 }
 
 export async function updateService(id: number, formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const fields = fieldsFromForm(formData)
 
   const { error } = await supabase.from('services').update(fields).eq('id', id)
@@ -57,7 +57,7 @@ export async function updateService(id: number, formData: FormData) {
 }
 
 export async function deleteService(id: number) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('services').delete().eq('id', id)
   if (error) return { success: false as const, error: error.message }
 
@@ -66,7 +66,7 @@ export async function deleteService(id: number) {
 }
 
 export async function toggleServicePublished(id: number, current: boolean) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('services').update({ is_published: !current }).eq('id', id)
   if (error) throw new Error(error.message)
   revalidatePath('/admin/content/services')

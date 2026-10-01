@@ -1,6 +1,6 @@
 'use server'
 
-import { createAdminClient } from '@/app/lib/supabase/admin'
+import { requireAdmin } from '@/app/lib/supabase/require-admin'
 import { revalidatePath } from 'next/cache'
 
 function text(formData: FormData, name: string) {
@@ -8,7 +8,7 @@ function text(formData: FormData, name: string) {
 }
 
 export async function saveSettings(formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
 
   const rows = [
     {

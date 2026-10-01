@@ -1,6 +1,6 @@
 'use server'
 
-import { createAdminClient } from '@/app/lib/supabase/admin'
+import { requireAdmin } from '@/app/lib/supabase/require-admin'
 import { revalidatePath } from 'next/cache'
 
 function fieldsFromForm(formData: FormData) {
@@ -21,7 +21,7 @@ function fieldsFromForm(formData: FormData) {
 }
 
 export async function createCustomer(formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const fields = fieldsFromForm(formData)
 
   const { data, error } = await supabase.from('customers').insert(fields).select('id').single()
@@ -32,7 +32,7 @@ export async function createCustomer(formData: FormData) {
 }
 
 export async function updateCustomer(id: number, formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const fields = fieldsFromForm(formData)
 
   const { error } = await supabase.from('customers').update(fields).eq('id', id)
@@ -44,7 +44,7 @@ export async function updateCustomer(id: number, formData: FormData) {
 }
 
 export async function deleteCustomer(id: number) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('customers').delete().eq('id', id)
 
   if (error) {

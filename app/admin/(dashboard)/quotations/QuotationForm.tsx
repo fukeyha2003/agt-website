@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 type Customer = { id: number; company: string | null; contact_person: string }
@@ -328,9 +329,9 @@ export default function QuotationForm({
         >
           {isPending ? 'Saving…' : submitLabel}
         </button>
-        <a href="/admin/quotations" className="text-sm font-medium text-gray-500 hover:text-gray-700">
+        <Link href="/admin/quotations" className="text-sm font-medium text-gray-500 hover:text-gray-700">
           Cancel
-        </a>
+        </Link>
       </div>
     </form>
   )

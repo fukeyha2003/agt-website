@@ -1,6 +1,7 @@
 'use server'
 
-import { createAdminClient } from '@/app/lib/supabase/admin'
+import type { createAdminClient } from '@/app/lib/supabase/admin'
+import { requireAdmin } from '@/app/lib/supabase/require-admin'
 import { revalidatePath } from 'next/cache'
 
 type SupabaseAdmin = ReturnType<typeof createAdminClient>
@@ -93,7 +94,7 @@ function sharedFields(formData: FormData) {
 }
 
 export async function createQuotation(formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
 
   const customerId = await resolveCustomerId(supabase, formData)
   const items = parseItems(formData)
@@ -132,7 +133,7 @@ export async function createQuotation(formData: FormData) {
 }
 
 export async function updateQuotation(id: number, formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
 
   const customerId = await resolveCustomerId(supabase, formData)
   const items = parseItems(formData)
@@ -170,14 +171,14 @@ export async function updateQuotation(id: number, formData: FormData) {
 }
 
 export async function deleteQuotation(id: number) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('quotations').delete().eq('id', id)
   if (error) throw new Error(error.message)
   revalidatePath('/admin/quotations')
 }
 
 export async function updateQuotationStatus(id: number, status: string) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const patch: Record<string, unknown> = { status }
   if (status === 'sent') patch.sent_at = new Date().toISOString()
   const { error } = await supabase.from('quotations').update(patch).eq('id', id)

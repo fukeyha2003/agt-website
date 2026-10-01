@@ -1,6 +1,7 @@
 'use server'
 
-import { createAdminClient } from '@/app/lib/supabase/admin'
+import type { createAdminClient } from '@/app/lib/supabase/admin'
+import { requireAdmin } from '@/app/lib/supabase/require-admin'
 import { revalidatePath } from 'next/cache'
 
 type SupabaseAdmin = ReturnType<typeof createAdminClient>
@@ -36,7 +37,7 @@ async function syncProducts(supabase: SupabaseAdmin, supplierId: number, formDat
 }
 
 export async function createSupplier(formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const fields = fieldsFromForm(formData)
 
   const { data, error } = await supabase.from('suppliers').insert(fields).select('id').single()
@@ -49,7 +50,7 @@ export async function createSupplier(formData: FormData) {
 }
 
 export async function updateSupplier(id: number, formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const fields = fieldsFromForm(formData)
 
   const { error } = await supabase.from('suppliers').update(fields).eq('id', id)
@@ -63,7 +64,7 @@ export async function updateSupplier(id: number, formData: FormData) {
 }
 
 export async function deleteSupplier(id: number) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   // product_supplier and supplier_transactions rows cascade automatically
   const { error } = await supabase.from('suppliers').delete().eq('id', id)
   if (error) return { success: false as const, error: error.message }
@@ -73,7 +74,7 @@ export async function deleteSupplier(id: number) {
 }
 
 export async function toggleSupplierActive(id: number, current: boolean) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('suppliers').update({ is_active: !current }).eq('id', id)
   if (error) throw new Error(error.message)
   revalidatePath('/admin/suppliers')
@@ -87,7 +88,7 @@ function numberOrNull(value: FormDataEntryValue | null) {
 }
 
 export async function addTransaction(supplierId: number, formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
 
   const date = String(formData.get('transaction_date') || '').trim()
   if (!date) throw new Error('Transaction date is required.')
@@ -112,7 +113,7 @@ export async function addTransaction(supplierId: number, formData: FormData) {
 }
 
 export async function deleteTransaction(id: number, supplierId: number) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('supplier_transactions').delete().eq('id', id)
   if (error) throw new Error(error.message)
   revalidatePath(`/admin/suppliers/${supplierId}`)

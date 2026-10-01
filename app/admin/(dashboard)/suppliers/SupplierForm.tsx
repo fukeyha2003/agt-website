@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 type ProductOption = { id: number; name: string }
@@ -131,9 +132,9 @@ export default function SupplierForm({ action, products, initialData, submitLabe
         >
           {isPending ? 'Saving…' : submitLabel}
         </button>
-        <a href="/admin/suppliers" className="text-sm font-medium text-gray-500 hover:text-gray-700">
+        <Link href="/admin/suppliers" className="text-sm font-medium text-gray-500 hover:text-gray-700">
           Cancel
-        </a>
+        </Link>
       </div>
     </form>
   )

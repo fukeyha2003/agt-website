@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 type ProductOption = { slug: string; name: string }
@@ -126,9 +127,9 @@ export default function CustomerForm({ action, products, initialData, submitLabe
         >
           {isPending ? 'Saving…' : submitLabel}
         </button>
-        <a href="/admin/customers" className="text-sm font-medium text-gray-500 hover:text-gray-700">
+        <Link href="/admin/customers" className="text-sm font-medium text-gray-500 hover:text-gray-700">
           Cancel
-        </a>
+        </Link>
       </div>
     </form>
   )

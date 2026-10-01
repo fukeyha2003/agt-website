@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 type InitialData = {
@@ -175,9 +176,9 @@ export default function PostForm({ action, initialData, submitLabel = 'Save Post
         >
           {isPending ? 'Saving…' : submitLabel}
         </button>
-        <a href="/admin/content/posts" className="text-sm font-medium text-gray-500 hover:text-gray-700">
+        <Link href="/admin/content/posts" className="text-sm font-medium text-gray-500 hover:text-gray-700">
           Cancel
-        </a>
+        </Link>
       </div>
     </form>
   )
