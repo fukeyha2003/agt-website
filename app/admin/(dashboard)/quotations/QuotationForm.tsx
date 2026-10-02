@@ -1,17 +1,15 @@
 'use client'
 
 import { useMemo, useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 type Customer = { id: number; company: string | null; contact_person: string }
-type ProductOption = { id: number; name: string; unit: string | null }
-type QuoteRequestOption = { id: number; reference: string; name: string }
 
-type Item = { product_id: string; description: string; quantity: string; unit: string; unit_price: string }
+type Item = { description: string; quantity: string; unit: string; unit_price: string }
 
 type InitialData = {
   customer_id: number
-  quote_request_id: number | null
   quotation_date: string
   valid_until: string | null
   delivery_location: string | null
@@ -25,8 +23,6 @@ type InitialData = {
 type QuotationFormProps = {
   action: (formData: FormData) => Promise<{ success: true; id: number }>
   customers: Customer[]
-  products: ProductOption[]
-  quoteRequests: QuoteRequestOption[]
   initialData?: InitialData
   submitLabel?: string
 }
@@ -45,13 +41,11 @@ function plus30Days() {
   return d.toISOString().slice(0, 10)
 }
 
-const emptyItem: Item = { product_id: '', description: '', quantity: '', unit: 'MT', unit_price: '' }
+const emptyItem: Item = { description: '', quantity: '', unit: 'MT', unit_price: '' }
 
 export default function QuotationForm({
   action,
   customers,
-  products,
-  quoteRequests,
   initialData,
   submitLabel = 'Save Quotation',
 }: QuotationFormProps) {
@@ -89,15 +83,6 @@ export default function QuotationForm({
 
   function updateItem(index: number, patch: Partial<Item>) {
     setItems((prev) => prev.map((it, i) => (i === index ? { ...it, ...patch } : it)))
-  }
-
-  function handleProductPick(index: number, productId: string) {
-    const product = products.find((p) => String(p.id) === productId)
-    updateItem(index, {
-      product_id: productId,
-      description: items[index].description || product?.name || '',
-      unit: product?.unit || items[index].unit,
-    })
   }
 
   const currency = initialData?.currency ?? 'PKR'
@@ -157,19 +142,6 @@ export default function QuotationForm({
           </div>
         )}
 
-        {quoteRequests.length > 0 && (
-          <div className="mt-4">
-            <label className={labelClass}>Linked Inquiry (optional)</label>
-            <select name="quote_request_id" defaultValue={initialData?.quote_request_id ?? ''} className={`${inputClass} max-w-md`}>
-              <option value="">— None —</option>
-              {quoteRequests.map((qr) => (
-                <option key={qr.id} value={qr.id}>
-                  {qr.reference} — {qr.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
       </div>
 
       {/* Details */}
@@ -229,27 +201,13 @@ export default function QuotationForm({
             const lineTotal = (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)
             return (
               <div key={i} className="grid grid-cols-1 gap-2 rounded-lg border border-gray-100 p-3 sm:grid-cols-12 sm:items-start">
-                <select
-                  value={item.product_id}
-                  onChange={(e) => handleProductPick(i, e.target.value)}
-                  className={`${inputClass} mt-0 sm:col-span-3`}
-                >
-                  <option value="">Product (optional)</option>
-                  {products.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-                <input type="hidden" name="item_product_id" value={item.product_id} />
-
                 <input
                   name="item_description"
                   required
                   value={item.description}
                   onChange={(e) => updateItem(i, { description: e.target.value })}
-                  placeholder="Description"
-                  className={`${inputClass} mt-0 sm:col-span-3`}
+                  placeholder="Description (e.g. HSD / Diesel)"
+                  className={`${inputClass} mt-0 sm:col-span-5`}
                 />
                 <input
                   type="number"
@@ -259,7 +217,7 @@ export default function QuotationForm({
                   value={item.quantity}
                   onChange={(e) => updateItem(i, { quantity: e.target.value })}
                   placeholder="Qty"
-                  className={`${inputClass} mt-0 sm:col-span-1`}
+                  className={`${inputClass} mt-0 sm:col-span-2`}
                 />
                 <input
                   name="item_unit"
@@ -328,9 +286,9 @@ export default function QuotationForm({
         >
           {isPending ? 'Saving…' : submitLabel}
         </button>
-        <a href="/admin/quotations" className="text-sm font-medium text-gray-500 hover:text-gray-700">
+        <Link href="/admin/quotations" className="text-sm font-medium text-gray-500 hover:text-gray-700">
           Cancel
-        </a>
+        </Link>
       </div>
     </form>
   )

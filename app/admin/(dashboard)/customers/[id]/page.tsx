@@ -8,9 +8,8 @@ export default async function EditCustomerPage({ params }: { params: Promise<{ i
   const { id } = await params
   const supabase = createAdminClient()
 
-  const [{ data: customer }, { data: products }, { data: quotations }] = await Promise.all([
+  const [{ data: customer }, { data: quotations }] = await Promise.all([
     supabase.from('customers').select('*').eq('id', id).single(),
-    supabase.from('products').select('slug, name').order('sort_order', { ascending: true }),
     supabase
       .from('quotations')
       .select('id, number, quotation_date, currency, total, status')
@@ -31,7 +30,6 @@ export default async function EditCustomerPage({ params }: { params: Promise<{ i
       <div className="mt-6">
         <CustomerForm
           action={boundUpdate}
-          products={products ?? []}
           submitLabel="Save Changes"
           initialData={{
             company: customer.company,
@@ -40,9 +38,6 @@ export default async function EditCustomerPage({ params }: { params: Promise<{ i
             email: customer.email,
             city: customer.city,
             address: customer.address,
-            source: customer.source,
-            type: customer.type,
-            product_interest: Array.isArray(customer.product_interest) ? customer.product_interest : [],
           }}
         />
       </div>
@@ -67,6 +62,11 @@ export default async function EditCustomerPage({ params }: { params: Promise<{ i
                       {q.currency} {Number(q.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="px-5 py-3 capitalize text-gray-500">{q.status}</td>
+                    <td className="px-5 py-3 text-right">
+                      <Link href={`/admin/quotations/${q.id}/pdf`} target="_blank" className="font-medium text-[#062F4F] hover:underline">
+                        PDF
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

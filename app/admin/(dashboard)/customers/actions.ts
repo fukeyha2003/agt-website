@@ -1,6 +1,6 @@
 'use server'
 
-import { createAdminClient } from '@/app/lib/supabase/admin'
+import { requireAdmin } from '@/app/lib/supabase/require-admin'
 import { revalidatePath } from 'next/cache'
 
 function fieldsFromForm(formData: FormData) {
@@ -14,17 +14,17 @@ function fieldsFromForm(formData: FormData) {
     email: String(formData.get('email') || '').trim() || null,
     city: String(formData.get('city') || '').trim() || null,
     address: String(formData.get('address') || '').trim() || null,
-    source: String(formData.get('source') || '').trim() || null,
-    type: formData.get('type') === 'customer' ? 'customer' : 'lead',
-    product_interest: formData.getAll('product_interest') as string[],
   }
 }
 
 export async function createCustomer(formData: FormData) {
-  const supabase = createAdminClient()
-  const fields = fieldsFromForm(formData)
+  const supabase = await requireAdmin()
 
-  const { data, error } = await supabase.from('customers').insert(fields).select('id').single()
+  const { data, error } = await supabase
+    .from('customers')
+    .insert({ ...fieldsFromForm(formData), type: 'customer' })
+    .select('id')
+    .single()
   if (error) throw new Error(error.message)
 
   revalidatePath('/admin/customers')
@@ -32,10 +32,9 @@ export async function createCustomer(formData: FormData) {
 }
 
 export async function updateCustomer(id: number, formData: FormData) {
-  const supabase = createAdminClient()
-  const fields = fieldsFromForm(formData)
+  const supabase = await requireAdmin()
 
-  const { error } = await supabase.from('customers').update(fields).eq('id', id)
+  const { error } = await supabase.from('customers').update(fieldsFromForm(formData)).eq('id', id)
   if (error) throw new Error(error.message)
 
   revalidatePath('/admin/customers')
@@ -44,7 +43,7 @@ export async function updateCustomer(id: number, formData: FormData) {
 }
 
 export async function deleteCustomer(id: number) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('customers').delete().eq('id', id)
 
   if (error) {

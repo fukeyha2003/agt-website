@@ -12,5 +12,5 @@ export async function signIn(_prevState: { error: string } | undefined, formData
 
   if (error) return { error: 'Invalid email or password.' }
 
-  redirect('/admin')
+  redirect('/admin/quotations')
 }

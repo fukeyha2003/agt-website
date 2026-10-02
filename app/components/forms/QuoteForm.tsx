@@ -191,7 +191,8 @@ export default function QuoteForm() {
       Object.entries(values).forEach(([k, v]) => formData.append(k, v))
       formData.append('message', message)
       if (file) formData.append('attachment', file)
-
+               const honeypot = formRef.current?.elements.namedItem('website') as HTMLInputElement | null
+      if (honeypot?.value) formData.append('website', honeypot.value)
       const res = await fetch('/api/request-quote', { method: 'POST', body: formData })
       const data = await res.json()
 
@@ -246,6 +247,11 @@ export default function QuoteForm() {
       noValidate
       className="scroll-mt-6 rounded-2xl bg-white p-6 shadow-[0_20px_50px_rgba(6,47,79,0.14)] ring-1 ring-[#062F4F]/5 sm:p-8 lg:p-10"
     >
+            {/* Spam trap: hidden from people, bots fill it in. Leave it empty. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="website">Website</label>
+        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
       <div>
         <h2 className="font-serif text-2xl font-bold tracking-[-0.01em] text-[#062F4F] sm:text-[28px]">
           Tell us what you need

@@ -8,19 +8,11 @@ export default async function EditQuotationPage({ params }: { params: Promise<{ 
   const { id } = await params
   const supabase = createAdminClient()
 
-  const [{ data: quotation }, { data: items }, { data: customers }, { data: products }, { data: quoteRequests }] =
-    await Promise.all([
-      supabase.from('quotations').select('*').eq('id', id).single(),
-      supabase.from('quotation_items').select('*').eq('quotation_id', id).order('sort_order', { ascending: true }),
-      supabase.from('customers').select('id, company, contact_person').order('company', { ascending: true }),
-      supabase.from('products').select('id, name, unit').order('name', { ascending: true }),
-      supabase
-        .from('quote_requests')
-        .select('id, reference, name')
-        .not('status', 'in', '(won,lost)')
-        .order('created_at', { ascending: false })
-        .limit(50),
-    ])
+  const [{ data: quotation }, { data: items }, { data: customers }] = await Promise.all([
+    supabase.from('quotations').select('*').eq('id', id).single(),
+    supabase.from('quotation_items').select('*').eq('quotation_id', id).order('sort_order', { ascending: true }),
+    supabase.from('customers').select('id, company, contact_person').order('company', { ascending: true }),
+  ])
 
   if (!quotation) notFound()
 
@@ -42,12 +34,9 @@ export default async function EditQuotationPage({ params }: { params: Promise<{ 
         <QuotationForm
           action={boundUpdate}
           customers={customers ?? []}
-          products={products ?? []}
-          quoteRequests={quoteRequests ?? []}
           submitLabel="Save Changes"
           initialData={{
             customer_id: quotation.customer_id,
-            quote_request_id: quotation.quote_request_id,
             quotation_date: quotation.quotation_date,
             valid_until: quotation.valid_until,
             delivery_location: quotation.delivery_location,
@@ -56,7 +45,6 @@ export default async function EditQuotationPage({ params }: { params: Promise<{ 
             currency: quotation.currency,
             tax_percent: quotation.tax_percent,
             items: (items ?? []).map((it) => ({
-              product_id: it.product_id ? String(it.product_id) : '',
               description: it.description,
               quantity: String(it.quantity),
               unit: it.unit,

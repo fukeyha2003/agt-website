@@ -2,34 +2,17 @@ import Link from 'next/link'
 import { createAdminClient } from '@/app/lib/supabase/admin'
 import DeleteButton from './DeleteButton'
 
-const TABS = [
-  { key: 'all', label: 'All' },
-  { key: 'lead', label: 'Leads' },
-  { key: 'customer', label: 'Customers' },
-]
-
-const TYPE_STYLES: Record<string, string> = {
-  lead: 'bg-amber-100 text-amber-700',
-  customer: 'bg-green-100 text-green-700',
-}
-
-export default async function CustomersPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string; type?: string }>
-}) {
-  const { q, type } = await searchParams
-  const activeType = type === 'lead' || type === 'customer' ? type : 'all'
+export default async function CustomersPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams
   // strip characters that would break PostgREST's or() filter syntax
   const search = (q ?? '').replace(/[,()]/g, ' ').trim()
 
   const supabase = createAdminClient()
   let query = supabase
     .from('customers')
-    .select('id, company, contact_person, phone, email, city, type, quotations(count)')
+    .select('id, company, contact_person, phone, email, city, quotations(count)')
     .order('created_at', { ascending: false })
 
-  if (activeType !== 'all') query = query.eq('type', activeType)
   if (search) {
     query = query.or(
       `company.ilike.%${search}%,contact_person.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`
@@ -50,33 +33,14 @@ export default async function CustomersPage({
         </Link>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200">
-        <div className="flex gap-2">
-          {TABS.map((tab) => (
-            <Link
-              key={tab.key}
-              href={tab.key === 'all' ? '/admin/customers' : `/admin/customers?type=${tab.key}`}
-              className={`shrink-0 border-b-2 px-3 py-2 text-sm font-medium transition ${
-                activeType === tab.key
-                  ? 'border-[#D89B16] text-[#062F4F]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
-
-        <form className="pb-2" action="/admin/customers">
-          {activeType !== 'all' && <input type="hidden" name="type" value={activeType} />}
-          <input
-            name="q"
-            defaultValue={search}
-            placeholder="Search name, company, email, phone"
-            className="h-9 w-64 rounded-lg border border-gray-200 px-3 text-sm text-[#062F4F] focus:border-[#D89B16] focus:outline-none focus:ring-2 focus:ring-[#D89B16]/30"
-          />
-        </form>
-      </div>
+      <form className="mt-4" action="/admin/customers">
+        <input
+          name="q"
+          defaultValue={search}
+          placeholder="Search name, company, email, phone"
+          className="h-9 w-72 rounded-lg border border-gray-200 bg-white px-3 text-sm text-[#062F4F] focus:border-[#D89B16] focus:outline-none focus:ring-2 focus:ring-[#D89B16]/30"
+        />
+      </form>
 
       <div className="mt-6 overflow-hidden rounded-xl bg-white shadow-sm">
         <table className="w-full text-left text-sm">
@@ -86,7 +50,6 @@ export default async function CustomersPage({
               <th className="px-5 py-3">Phone</th>
               <th className="px-5 py-3">Email</th>
               <th className="px-5 py-3">City</th>
-              <th className="px-5 py-3">Type</th>
               <th className="px-5 py-3">Quotations</th>
               <th className="px-5 py-3 text-right">Actions</th>
             </tr>
@@ -105,11 +68,6 @@ export default async function CustomersPage({
                   <td className="px-5 py-3 text-gray-600">{c.phone || '—'}</td>
                   <td className="px-5 py-3 text-gray-600">{c.email || '—'}</td>
                   <td className="px-5 py-3 text-gray-600">{c.city || '—'}</td>
-                  <td className="px-5 py-3">
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${TYPE_STYLES[c.type]}`}>
-                      {c.type}
-                    </span>
-                  </td>
                   <td className="px-5 py-3 text-gray-600">{quoteCount}</td>
                   <td className="px-5 py-3">
                     <div className="flex justify-end gap-4">

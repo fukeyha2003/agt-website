@@ -4,12 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const NAV = [
-  { href: '/admin', label: 'Dashboard' },
-  { href: '/admin/inquiries', label: 'Inquiries' },
   { href: '/admin/quotations', label: 'Quotations' },
   { href: '/admin/customers', label: 'Customers' },
-  { href: '/admin/products', label: 'Products' },
-  { href: '/admin/suppliers', label: 'Suppliers' },
 ]
 
 export default function AdminNav() {
@@ -18,9 +14,7 @@ export default function AdminNav() {
   return (
     <nav className="mt-4 space-y-1 px-3">
       {NAV.map((item) => {
-        // exact match for the Dashboard root; startsWith for everything else
-        // so /admin/inquiries/123 still highlights "Inquiries"
-        const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href)
+        const isActive = pathname.startsWith(item.href)
 
         return (
           <Link

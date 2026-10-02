@@ -7,6 +7,10 @@ export const runtime = 'nodejs'
 const MAX_FILE_BYTES = 5 * 1024 * 1024
 const ALLOWED_EXT = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png']
 
+// Spam protection: at most this many requests per IP address in the window.
+const RATE_LIMIT = 3
+const RATE_WINDOW_MINUTES = 10
+
 function generateReference() {
   const now = new Date()
   const yy = String(now.getFullYear()).slice(2)
@@ -86,6 +90,12 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
 
+    // Honeypot: real visitors never see or fill the hidden "website" field,
+    // bots usually do. Pretend it worked so the bot moves on.
+    if (String(formData.get('website') || '').trim()) {
+      return NextResponse.json({ success: true, reference: 'AGT-RECEIVED' })
+    }
+
     const fields = {
       name: String(formData.get('name') || ''),
       company: String(formData.get('company') || ''),
@@ -112,6 +122,31 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = createAdminClient()
+
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      null
+
+    if (ip) {
+      const since = new Date(Date.now() - RATE_WINDOW_MINUTES * 60 * 1000).toISOString()
+      const { count } = await supabase
+        .from('quote_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('ip_address', ip)
+        .gte('created_at', since)
+
+      if ((count ?? 0) >= RATE_LIMIT) {
+        return NextResponse.json(
+          {
+            success: false,
+            errors: { form: 'You have sent several requests in a short time. Please wait a few minutes, or call us directly.' },
+          },
+          { status: 429 }
+        )
+      }
+    }
+
     const reference = generateReference()
 
     let attachmentPath: string | null = null
@@ -137,11 +172,6 @@ export async function POST(request: NextRequest) {
       attachmentPath = path
       attachmentName = file.name
     }
-
-    const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      request.headers.get('x-real-ip') ||
-      null
 
     const { error: insertError } = await supabase
       .from('quote_requests')
@@ -179,7 +209,7 @@ export async function POST(request: NextRequest) {
 
         await resend.emails.send({
           from: process.env.QUOTE_NOTIFY_FROM || 'AGT Website <onboarding@resend.dev>',
-          to: process.env.QUOTE_NOTIFY_TO || 'fukeharizwan2003@gmail.com',
+          to: process.env.QUOTE_NOTIFY_TO || 'agogt77@gmail.com',
           replyTo: fields.email.trim(),
           subject: `New Quote Request — ${reference}`,
           text: [

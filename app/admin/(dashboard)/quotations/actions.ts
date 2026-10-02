@@ -1,6 +1,7 @@
 'use server'
 
-import { createAdminClient } from '@/app/lib/supabase/admin'
+import type { createAdminClient } from '@/app/lib/supabase/admin'
+import { requireAdmin } from '@/app/lib/supabase/require-admin'
 import { revalidatePath } from 'next/cache'
 
 type SupabaseAdmin = ReturnType<typeof createAdminClient>
@@ -27,7 +28,6 @@ async function generateQuotationNumber(supabase: SupabaseAdmin) {
 }
 
 function parseItems(formData: FormData) {
-  const productIds = formData.getAll('item_product_id') as string[]
   const descriptions = formData.getAll('item_description') as string[]
   const quantities = formData.getAll('item_quantity') as string[]
   const units = formData.getAll('item_unit') as string[]
@@ -35,7 +35,6 @@ function parseItems(formData: FormData) {
 
   return descriptions
     .map((description, i) => ({
-      product_id: productIds[i] ? Number(productIds[i]) : null,
       description: description.trim(),
       quantity: Number(quantities[i] || 0),
       unit: (units[i] || 'MT').trim(),
@@ -93,7 +92,7 @@ function sharedFields(formData: FormData) {
 }
 
 export async function createQuotation(formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
 
   const customerId = await resolveCustomerId(supabase, formData)
   const items = parseItems(formData)
@@ -102,14 +101,12 @@ export async function createQuotation(formData: FormData) {
   const taxPercent = Number(formData.get('tax_percent') || 0)
   const { subtotal, taxAmount, total } = calculateTotals(items, taxPercent)
   const number = await generateQuotationNumber(supabase)
-  const quoteRequestId = formData.get('quote_request_id')
 
   const { data: quotation, error } = await supabase
     .from('quotations')
     .insert({
       number,
       customer_id: customerId,
-      quote_request_id: quoteRequestId ? Number(quoteRequestId) : null,
       ...sharedFields(formData),
       subtotal,
       tax_percent: taxPercent,
@@ -132,7 +129,7 @@ export async function createQuotation(formData: FormData) {
 }
 
 export async function updateQuotation(id: number, formData: FormData) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
 
   const customerId = await resolveCustomerId(supabase, formData)
   const items = parseItems(formData)
@@ -170,14 +167,14 @@ export async function updateQuotation(id: number, formData: FormData) {
 }
 
 export async function deleteQuotation(id: number) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('quotations').delete().eq('id', id)
   if (error) throw new Error(error.message)
   revalidatePath('/admin/quotations')
 }
 
 export async function updateQuotationStatus(id: number, status: string) {
-  const supabase = createAdminClient()
+  const supabase = await requireAdmin()
   const patch: Record<string, unknown> = { status }
   if (status === 'sent') patch.sent_at = new Date().toISOString()
   const { error } = await supabase.from('quotations').update(patch).eq('id', id)
