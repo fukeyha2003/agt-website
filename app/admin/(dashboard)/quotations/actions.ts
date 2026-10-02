@@ -2,6 +2,7 @@
 
 import type { createAdminClient } from '@/app/lib/supabase/admin'
 import { requireAdmin } from '@/app/lib/supabase/require-admin'
+import { findCustomerId } from '@/app/lib/customers'
 import { revalidatePath } from 'next/cache'
 
 type SupabaseAdmin = ReturnType<typeof createAdminClient>
@@ -63,15 +64,23 @@ async function resolveCustomerId(supabase: SupabaseAdmin, formData: FormData): P
   const contactPerson = String(formData.get('new_contact_person') || '').trim()
   if (!contactPerson) throw new Error('Contact person is required for a new customer.')
 
+  const phone = String(formData.get('new_phone') || '').trim() || null
+  const email = String(formData.get('new_email') || '').trim() || null
+
+  // Reuse an existing customer with the same email or phone instead of
+  // creating a duplicate (e.g. someone who sent a second inquiry).
+  const existingId = await findCustomerId(supabase, email, phone)
+  if (existingId) return existingId
+
   const { data, error } = await supabase
     .from('customers')
     .insert({
       company: String(formData.get('new_company') || '').trim() || null,
       contact_person: contactPerson,
-      phone: String(formData.get('new_phone') || '').trim() || null,
-      email: String(formData.get('new_email') || '').trim() || null,
+      phone,
+      email,
       type: 'customer',
-      source: 'quotation',
+      source: formData.get('quote_request_id') ? 'website' : 'quotation',
     })
     .select('id')
     .single()
@@ -101,12 +110,14 @@ export async function createQuotation(formData: FormData) {
   const taxPercent = Number(formData.get('tax_percent') || 0)
   const { subtotal, taxAmount, total } = calculateTotals(items, taxPercent)
   const number = await generateQuotationNumber(supabase)
+  const quoteRequestId = Number(formData.get('quote_request_id')) || null
 
   const { data: quotation, error } = await supabase
     .from('quotations')
     .insert({
       number,
       customer_id: customerId,
+      quote_request_id: quoteRequestId,
       ...sharedFields(formData),
       subtotal,
       tax_percent: taxPercent,
@@ -123,6 +134,11 @@ export async function createQuotation(formData: FormData) {
     .from('quotation_items')
     .insert(items.map((it) => ({ ...it, quotation_id: quotation.id })))
   if (itemsError) throw new Error(itemsError.message)
+
+  if (quoteRequestId) {
+    await supabase.from('quote_requests').update({ status: 'quotation_sent' }).eq('id', quoteRequestId)
+    revalidatePath('/admin/inquiries')
+  }
 
   revalidatePath('/admin/quotations')
   return { success: true as const, id: quotation.id }
@@ -168,8 +184,23 @@ export async function updateQuotation(id: number, formData: FormData) {
 
 export async function deleteQuotation(id: number) {
   const supabase = await requireAdmin()
+  const { data: quotation } = await supabase.from('quotations').select('quote_request_id').eq('id', id).single()
+
   const { error } = await supabase.from('quotations').delete().eq('id', id)
   if (error) throw new Error(error.message)
+
+  // If this quotation came from a website inquiry and it was the only one,
+  // put the inquiry back in the "Waiting" list.
+  const inquiryId = quotation?.quote_request_id
+  if (inquiryId) {
+    const { count } = await supabase
+      .from('quotations')
+      .select('id', { count: 'exact', head: true })
+      .eq('quote_request_id', inquiryId)
+    if (!count) await supabase.from('quote_requests').update({ status: 'new' }).eq('id', inquiryId)
+    revalidatePath('/admin/inquiries')
+  }
+
   revalidatePath('/admin/quotations')
 }
 

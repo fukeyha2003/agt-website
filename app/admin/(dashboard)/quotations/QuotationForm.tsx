@@ -8,8 +8,13 @@ type Customer = { id: number; company: string | null; contact_person: string }
 
 type Item = { description: string; quantity: string; unit: string; unit_price: string }
 
+type NewCustomer = { company: string; contact_person: string; phone: string; email: string }
+
 type InitialData = {
-  customer_id: number
+  customer_id: number | null
+  // Set when the quotation is made from a website inquiry
+  quote_request_id?: number | null
+  new_customer?: NewCustomer | null
   quotation_date: string
   valid_until: string | null
   delivery_location: string | null
@@ -52,7 +57,7 @@ export default function QuotationForm({
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [submitError, setSubmitError] = useState('')
-  const [customerMode, setCustomerMode] = useState<'existing' | 'new'>('existing')
+  const [customerMode, setCustomerMode] = useState<'existing' | 'new'>(initialData?.new_customer ? 'new' : 'existing')
   const [items, setItems] = useState<Item[]>(initialData?.items?.length ? initialData.items : [emptyItem])
   const [taxPercent, setTaxPercent] = useState(String(initialData?.tax_percent ?? 0))
 
@@ -86,6 +91,7 @@ export default function QuotationForm({
   }
 
   const currency = initialData?.currency ?? 'PKR'
+  const newCustomer = initialData?.new_customer
 
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl space-y-6">
@@ -93,6 +99,10 @@ export default function QuotationForm({
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {submitError}
         </div>
+      )}
+
+      {initialData?.quote_request_id && (
+        <input type="hidden" name="quote_request_id" value={initialData.quote_request_id} />
       )}
 
       {/* Customer */}
@@ -135,10 +145,16 @@ export default function QuotationForm({
         ) : (
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <input type="hidden" name="new_customer" value="on" />
-            <input name="new_company" placeholder="Company" className={inputClass} />
-            <input name="new_contact_person" required placeholder="Contact person *" className={inputClass} />
-            <input name="new_phone" placeholder="Phone" className={inputClass} />
-            <input name="new_email" placeholder="Email" type="email" className={inputClass} />
+            <input name="new_company" defaultValue={newCustomer?.company} placeholder="Company" className={inputClass} />
+            <input
+              name="new_contact_person"
+              required
+              defaultValue={newCustomer?.contact_person}
+              placeholder="Contact person *"
+              className={inputClass}
+            />
+            <input name="new_phone" defaultValue={newCustomer?.phone} placeholder="Phone" className={inputClass} />
+            <input name="new_email" defaultValue={newCustomer?.email} placeholder="Email" type="email" className={inputClass} />
           </div>
         )}
 
