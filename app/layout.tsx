@@ -10,9 +10,9 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair', weight: ['600', '700'] })
 
 export const metadata: Metadata = {
-  title: 'Abdul Ghafoor Oil & Gas Traders',
+  title: 'AG Oil & Gas Traders',
   description:
-    'Abdul Ghafoor Oil & Gas Traders — Petroleum Trading, Energy, Logistics and Business Consultancy solutions.',
+    'AG Oil & Gas Traders — Petroleum Trading, Energy, Logistics and Business Consultancy solutions.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
